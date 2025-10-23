@@ -15,15 +15,15 @@ data:
     management.endpoint.health.show-details=always
     management.health.livenessState.enabled=true
     management.health.readinessState.enabled=true
-    
+
   # Logging configuration
   logging.level.root: "INFO"
   logging.level.com.example: "DEBUG"
-  
+
   # Database configuration (example)
   database.url: "jdbc:postgresql://postgres-service:5432/springboot"
   database.driver: "org.postgresql.Driver"
-  
+
   # Cache configuration (example)
   cache.type: "redis"
   cache.host: "redis-service"
