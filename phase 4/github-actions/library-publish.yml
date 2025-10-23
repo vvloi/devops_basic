@@ -37,15 +37,15 @@ jobs:
         id: get_version
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+            echo "VERSION=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
           else
-            echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+            echo "VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Update version in pom.xml
         run: |
           cd library
-          mvn versions:set -DnewVersion=${{ steps.get_version.outputs.VERSION }}
+          mvn versions:set -DnewVersion="${{ steps.get_version.outputs.VERSION }}"
 
       - name: Build library
         run: |
@@ -116,15 +116,15 @@ jobs:
         id: get_version
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+            echo "VERSION=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
           else
-            echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+            echo "VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Update version in pom.xml
         run: |
           cd library
-          mvn versions:set -DnewVersion=${{ steps.get_version.outputs.VERSION }}
+          mvn versions:set -DnewVersion="${{ steps.get_version.outputs.VERSION }}"
 
       - name: Configure Maven settings
         run: |
@@ -193,6 +193,15 @@ jobs:
           else
             echo "❌ Artifact not found in Nexus (HTTP $HTTP_CODE)"
             exit 1
+          fi
+
+      - name: Extract version from tag
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Notify success
