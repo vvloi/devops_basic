@@ -1,0 +1,61 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: spring-boot-service
+  namespace: argocd
+  # Finalizer to ensure proper cleanup
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  # Labels for organization
+  labels:
+    app: spring-boot-service
+    environment: production
+spec:
+  # Project this application belongs to
+  project: devops-project
+
+  # Source repository and path
+  source:
+    repoURL: 'https://github.com/vvloi/devops_basic.git'
+    targetRevision: HEAD
+    path: phase 4/k8s-manifests/spring-boot-service
+
+  # Destination cluster and namespace
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: spring-boot-service
+
+  # Sync policy
+  syncPolicy:
+    # Automated sync configuration
+    automated:
+      # Automatically sync when changes are detected
+      prune: true
+      # Automatically create namespace if it doesn't exist
+      selfHeal: true
+      # Allow empty resources
+      allowEmpty: false
+
+    # Sync options
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+
+    # Retry configuration
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  # Ignore differences in certain fields
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+
+  # Health assessment
+  revisionHistoryLimit: 10

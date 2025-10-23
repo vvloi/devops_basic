@@ -1,0 +1,65 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: devops-project
+  namespace: argocd
+  # Finalizer to ensure cleanup
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  # Project description
+  description: DevOps Basic Project for Spring Boot Services
+
+  # Source repositories that applications in this project can pull from
+  sourceRepos:
+    - 'https://github.com/vvloi/devops_basic.git'
+    - '*'  # Allow any source repository
+
+  # Destinations where applications can be deployed
+  destinations:
+    - namespace: '*'
+      server: 'https://kubernetes.default.svc'
+    - namespace: '*'
+      name: in-cluster
+
+  # Cluster resources that are allowed to be managed
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+  # Namespace resources that are allowed to be managed
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+  # Roles for RBAC
+  roles:
+    # Admin role with full permissions
+    - name: admin
+      description: Admin role for devops-project
+      policies:
+        - p, proj:devops-project:admin, applications, *, devops-project/*, allow
+      groups:
+        - devops-admins
+
+    # Developer role with limited permissions
+    - name: developer
+      description: Developer role for devops-project
+      policies:
+        - p, proj:devops-project:developer, applications, get, devops-project/*, allow
+        - p, proj:devops-project:developer, applications, sync, devops-project/*, allow
+      groups:
+        - devops-developers
+
+  # Sync windows for controlling when syncs can happen
+  syncWindows:
+    - kind: allow
+      schedule: '* * * * *'
+      duration: 24h
+      applications:
+        - '*'
+      manualSync: true
+
+  # Orphaned resources monitoring
+  orphanedResources:
+    warn: true
