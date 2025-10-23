@@ -19,6 +19,8 @@ jobs:
   build-and-test:
     name: Build and Test Library
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -96,6 +98,8 @@ jobs:
     name: Publish to Nexus Repository
     runs-on: ubuntu-latest
     needs: build-and-test
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -167,6 +171,8 @@ jobs:
     name: Verify Publication
     runs-on: ubuntu-latest
     needs: publish-to-nexus
+    permissions:
+      contents: read
 
     steps:
       - name: Verify artifact in Nexus
